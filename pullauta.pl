@@ -2120,12 +2120,12 @@ if ( $command =~ /\.laz/ || $command =~ /\.las/ || $command =~ /\.xyz/ ) {
             }
 
             if ( $xfactor == 1 && $coordyfactor == 1 && $zfactor == 1 && $zoff == 0) {
-                system "~/oom_bno/mapy/karttapullautin/laszip-src-3.4.3/bin/LAStools/bin/las2txt -i \"" . $command
+                system "las2txt -i \"" . $command
                   . "\" -parse xyzcnri -keep_random_fraction $thinfactor -o $tempfolder/xyztemp.xyz";
 
             }
             else {
-                system "~/oom_bno/mapy/karttapullautin/laszip-src-3.4.3/bin/LAStools/bin/las2txt -i \"" . $command
+                system "las2txt -i \"" . $command
                   . "\" -parse xyzcnri -keep_random_fraction $thinfactor -o $tempfolder/xyztemp1.xyz";
 
                 print "Scaling xyz...";
