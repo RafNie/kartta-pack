@@ -1076,7 +1076,7 @@ if ( $command eq 'dxfmerge'||  $command eq 'merge' ) {
 
     use File::stat;
 
-    system( 'ls ' . $batchoutfolderwin . '\*.dxf /b > dxflist.txt' );
+    system( 'ls ' . $batchoutfolderwin . '/*.dxf > dxflist.txt' );
 
     open( SISAAN, "<dxflist.txt" );
     @dxflist = <SISAAN>;
@@ -1084,10 +1084,10 @@ if ( $command eq 'dxfmerge'||  $command eq 'merge' ) {
 ## contours
 open( ULOS2, ">merged.dxf" );
     open( ULOS, ">merged_contours.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /contours.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
@@ -1123,10 +1123,10 @@ open( ULOS2, ">merged.dxf" );
     $headprinted = '';
 ##cliffs
     open( ULOS, ">merged_c2.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /\_c2g.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
@@ -1153,10 +1153,10 @@ open( ULOS2, ">merged.dxf" );
 if($basemapcontours > 0){
     $headprinted = '';
     open( ULOS, ">merged_basemap.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /\_basemap.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
@@ -1184,10 +1184,10 @@ if($basemapcontours > 0){
 ###
     $headprinted = '';
     open( ULOS, ">merged_c3.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /\_c3g.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
@@ -1214,10 +1214,10 @@ if($basemapcontours > 0){
 ### formlines
     $headprinted = '';
     open( ULOS, ">formlines.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /\_formlines.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
@@ -1244,10 +1244,10 @@ if($basemapcontours > 0){
 ## dotknolls
     $headprinted = '';
     open( ULOS, ">merged_dotknolls.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /\_dotknolls.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
@@ -1274,10 +1274,10 @@ if($basemapcontours > 0){
 ###
     $headprinted = '';
     open( ULOS, ">merged_detected.dxf" );
-    foreach $dx (@dxflist) {
-        chomp($dx);
+    foreach $dxf (@dxflist) {
+        chomp($dxf);
 
-        $dxf = $batchoutfolder . "/" . $dx;
+#         $dxf = $batchoutfolder . "/" . $dx;
         if ( -e $dxf && ( $dxf =~ /\_detected.dxf/i ) ) {
             open( SISAAN, "<$dxf" );
             @dxf = <SISAAN>;
