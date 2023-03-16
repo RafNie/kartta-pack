@@ -341,7 +341,8 @@ if ( $formline > 0 ) { $indexcontours = 25; }
 $batch             = $Config->{_}->{batch};
 $batchoutfolder    = $Config->{_}->{batchoutfolder};
 $batchoutfolderwin = $batchoutfolder;
-$batchoutfolderwin =~ s/\//\\/g;
+#$batchoutfolderwin =~ s/\//\\/g;
+$batchoutfolderwin =~ s/\\/\//g;
 $batchoutfolder    =~ s/\\/\//g;
 
 $lazfolder = $Config->{_}->{lazfolder};
@@ -1312,7 +1313,7 @@ if ( $command eq 'pngmerge' || $command eq 'pngmergedepr' ) {
     use GD;
     use File::stat;
 
-    system( 'ls ' . $batchoutfolderwin . '\*.png /b > pnglist.txt' );
+    system( 'ls ' . $batchoutfolderwin . '/*.png > pnglist.txt' );
 
     open( SISAAN, "<pnglist.txt" );
     @pnglist = <SISAAN>;
@@ -1328,15 +1329,16 @@ if ( $command eq 'pngmerge' || $command eq 'pngmergedepr' ) {
 		$png0=$png;
         $png =~ s/\.png/\.pgw/;
 
-        $png = $batchoutfolder . "/" . $png;
+#         $png = $batchoutfolder . "/" . $png;
         if (
                -e $png
             && !( $png =~ /\_vege\.png/ )
+            && !( $png =~ /\_undergrowth\.png/ )
             && (   ( $png =~ /depr/ && $command eq 'pngmergedepr' )
                 || ( !( $png =~ /depr/ ) && $command eq 'pngmerge' ) )
           )
         {
-			$myImage = newFromPng GD::Image( $batchoutfolder . "/" . $png0, 1 );
+			$myImage = newFromPng GD::Image( $png0, 1 );
 
             ( $width, $height ) = $myImage->getBounds();
 			
@@ -1371,7 +1373,7 @@ if ( $command eq 'pngmerge' || $command eq 'pngmergedepr' ) {
     foreach $png (@pnglist) {
 
         chomp($png);
-        $png = $batchoutfolder . "/" . $png;
+#         $png = $batchoutfolder . "/" . $png;
 
         print "$png\n";
 
@@ -1380,6 +1382,7 @@ if ( $command eq 'pngmerge' || $command eq 'pngmergedepr' ) {
                $filesize > 0
             && -e $png
             && !( $png =~ /\_vege\.png/ )
+            && !( $png =~ /\_undergrowth\.png/ )
             && (   ( $png =~ /depr/ && $command eq 'pngmergedepr' )
                 || ( !( $png =~ /depr/ ) && $command eq 'pngmerge' ) )
           )
@@ -1466,7 +1469,7 @@ if ( $command eq 'pngmergevege' ) {
     use GD;
     use File::stat;
 
-    system( 'ls ' . $batchoutfolderwin . '\*_vege.png /b > pnglist.txt' );
+    system( 'ls ' . $batchoutfolderwin . '/*_vege.png > pnglist.txt' );
 
     open( SISAAN, "<pnglist.txt" );
     @pnglist = <SISAAN>;
@@ -1479,14 +1482,12 @@ if ( $command eq 'pngmergevege' ) {
 
     foreach $png (@pnglist) {
         chomp($png);
-		
-		    $myImage = newFromPng GD::Image( $batchoutfolder . "/" . $png, 1 );
-
+		    $myImage = newFromPng GD::Image( $png, 1 );
             ( $width, $height ) = $myImage->getBounds();
 			
         $png =~ s/\.png/\.pgw/;
 
-        $png = $batchoutfolder . "/" . $png;
+#         $png = $batchoutfolder . "/" . $png;
         if ( -e $png ) {
             open( SISAAN, "<$png" );
             @tfw = <SISAAN>;
@@ -1519,7 +1520,7 @@ if ( $command eq 'pngmergevege' ) {
     foreach $png (@pnglist) {
 
         chomp($png);
-        $png = $batchoutfolder . "/" . $png;
+#         $png = $batchoutfolder . "/" . $png;
 
         print "$png\n";
 
@@ -1527,11 +1528,11 @@ if ( $command eq 'pngmergevege' ) {
         if ( $filesize > 0 && -e $png ) {
 
             $myImage = newFromPng GD::Image( $png, 1 );
-
             ( $width, $height ) = $myImage->getBounds();
             $i++;
             if ( $i == 1 ) {
                 if ( $scale == 1 ) {
+#                  B??D
                     $im = new GD::Image(
                         ( $xmax - $xmin  ) / $res / $scale,
                         ( $ymax - $ymin  ) / $res / $scale, 0 );
@@ -1548,7 +1549,6 @@ if ( $command eq 'pngmergevege' ) {
             open( SISAAN, "<$png" );
             @tfw = <SISAAN>;
             close(SISAAN);
-
             $im->copyResampled(
                 $myImage,
                 ( $tfw[4] - $xmin ) / $res / $scale,
@@ -1563,7 +1563,6 @@ if ( $command eq 'pngmergevege' ) {
 
         }
     }
-
     $| = 1;
     open( OUT, ">merged_vege.jpg" );
     binmode OUT;
@@ -1666,7 +1665,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
             close(FOUT);
 
 			unlink "header$thread.xyz";
-			system "las2txt -i $lazfolder$laz -header pound -keep_xy 0 0 0 0 -o header$thread.xyz";
+			system "las2txt -i $laz -header pound -keep_xy 0 0 0 0 -o header$thread.xyz";
 			if(-e "header$thread.xyz"){
 			# ok
 			}else{
@@ -1802,23 +1801,25 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
             close OUT;
 
             #print "filecopy ";
+            ($lazFile) = $laz =~ m#([^/]+)$#;
+            system( "cp -f pullautus$thread.png "
+                  . $batchoutfolder . "/"
+                  . $lazFile
+                  . '.png' );
+            system( "cp -f pullautus$thread.pgw "
+                  . $batchoutfolder . "/"
+                  . $lazFile
+                  . '.pgw' );
+            system( "cp -f pullautus_depr$thread.png "
+                  . $batchoutfolder . "/"
+                  . $lazFile
+                  . '_depr.png' );
+            system( "cp -f pullautus_depr$thread.pgw "
+                  . $batchoutfolder . "/"
+                  . $lazFile
+                  . '_depr.pgw' );
 
-            system( "cp pullautus$thread.png "
-                  . $batchoutfolderwin . "/"
-                  . $laz
-                  . '.png /Y' );
-            system( "cp pullautus$thread.pgw "
-                  . $batchoutfolderwin . "/"
-                  . $laz
-                  . '.pgw /Y' );
-            system( "cp pullautus_depr$thread.png "
-                  . $batchoutfolderwin . "/"
-                  . $laz
-                  . '_depr.png /Y' );
-            system( "cp pullautus_depr$thread.pgw "
-                  . $batchoutfolderwin . "/"
-                  . $laz
-                  . '_depr.pgw /Y' );
+
 
             #print "filecopy done!";
 
@@ -1842,7 +1843,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 0, 0, $width, $height
             );
 
-             open( OUT,">" . $batchoutfolderwin . "/" . $laz . '_undergrowth.png' );
+             open( OUT,">" . $batchoutfolderwin . "/" . $lazFile . '_undergrowth.png' );
             binmode OUT;
 
             # Convert the image to PNG and print it on standard output
@@ -1850,7 +1851,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
             close OUT;
 
 			
-			open( OUT,">" . $batchoutfolderwin . "/" . $laz . '_undergrowth.pgw' );
+			open( OUT,">" . $batchoutfolderwin . "/" . $lazFile . '_undergrowth.pgw' );
             print OUT @tfw;
             close OUT;
 			
@@ -1862,7 +1863,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 $im->copy( $myImage, -$dx, -$dy, 0, 0, $width, $height );
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_vege.png' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_vege.png' );
                 binmode OUT;
                 print OUT $im->png;
                 close OUT;
@@ -1877,7 +1878,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 $tfw[5] .= "\n";
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_vege.pgw' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_vege.pgw' );
                 print OUT @tfw;
                 close OUT;
                 ## dxf files
@@ -1889,7 +1890,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 &polylinedxfcrop;
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_contours.dxf' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_contours.dxf' );
                 print OUT $out;
                 close OUT;
 
@@ -1902,7 +1903,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 &polylinedxfcrop;
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_c2g.dxf' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_c2g.dxf' );
                 print OUT $out;
                 close OUT;
 
@@ -1913,7 +1914,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 &polylinedxfcrop;
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_c3g.dxf' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_c3g.dxf' );
                 print OUT $out;
                 close OUT;
 
@@ -1927,7 +1928,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 open( OUT,
                         ">"
                       . $batchoutfolderwin . "/"
-                      . $laz
+                      . $lazFile
                       . '_contours03.dxf' );
                 print OUT $out;
                 close OUT;
@@ -1939,7 +1940,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 &polylinedxfcrop;
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_detected.dxf' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_detected.dxf' );
                 print OUT $out;
                 close OUT;
 
@@ -1951,7 +1952,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 &polylinedxfcrop;
 
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_formlines.dxf' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_formlines.dxf' );
                 print OUT $out;
                 close OUT;
 				}
@@ -1987,7 +1988,7 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
                 }
                 $out .= $end;
                 open( OUT,
-                    ">" . $batchoutfolderwin . "/" . $laz . '_dotknolls.dxf' );
+                    ">" . $batchoutfolderwin . "/" . $lazFile . '_dotknolls.dxf' );
                 print OUT $out;
                 close OUT;
                 ## dotknolls.dxf done
@@ -2002,15 +2003,15 @@ if (   ( $command eq '' && $batch == 1 && $proc < 2 )
 	            open( OUT,
                         ">"
                       . $batchoutfolderwin . "/"
-                      . $laz
+                      . $lazFile
                       . '_basemap.dxf' );
                 print OUT $out;
                 close OUT;			
 				}
 			
             if ( $savetempfolders == 1 ) {
-                system "mkdir \"temp_" . $laz . "_dir\"";
-                system "cp temp$thread/\*\.\* \"temp_" . $laz
+                system "mkdir \"temp_" . $lazFile . "_dir\"";
+                system "cp temp$thread/\*\.\* \"temp_" . $lazFile
                   . "_dir/\"";
             }
 
@@ -2074,7 +2075,7 @@ if ( $command =~ /\.laz/ || $command =~ /\.las/ || $command =~ /\.xyz/ ) {
 		 $lastxtexe=1;
 		}
 		
-        if ( -e 'las2txt.exe'  || $lastxtexe==1) {
+        if ( -e 'las2txt'  || $lastxtexe==1) {
 
 		   # unlink "$tempfolder/header.xyz";
 			
@@ -2119,12 +2120,12 @@ if ( $command =~ /\.laz/ || $command =~ /\.las/ || $command =~ /\.xyz/ ) {
             }
 
             if ( $xfactor == 1 && $coordyfactor == 1 && $zfactor == 1 && $zoff == 0) {
-                system "las2txt -i \"" . $command
+                system "~/oom_bno/mapy/karttapullautin/laszip-src-3.4.3/bin/LAStools/bin/las2txt -i \"" . $command
                   . "\" -parse xyzcnri -keep_random_fraction $thinfactor -o $tempfolder/xyztemp.xyz";
 
             }
             else {
-                system "las2txt -i \"" . $command
+                system "~/oom_bno/mapy/karttapullautin/laszip-src-3.4.3/bin/LAStools/bin/las2txt -i \"" . $command
                   . "\" -parse xyzcnri -keep_random_fraction $thinfactor -o $tempfolder/xyztemp1.xyz";
 
                 print "Scaling xyz...";
